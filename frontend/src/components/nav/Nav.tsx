@@ -3,6 +3,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Button, Menu } from "antd";
 import { useNavigate } from "react-router-dom";
+import { useBreadcrumb } from "../zustand/useBreadcrumb";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -11,7 +12,7 @@ const Nav: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const items: MenuItem[] = [
     {
-      key: "dashboards",
+      key: "Dashboards",
       icon: (
         <img
           className="w-[15px] h-[15px]"
@@ -20,10 +21,32 @@ const Nav: React.FC = () => {
         />
       ),
       label: "Dashboards",
-      onClick: () => navigate("/dashboard"),
+      onClick: () => {
+        navigate("/dashboard");
+        localStorage.setItem(
+          "breadcrumb",
+          JSON.stringify([
+            {
+              title: "Dashboard",
+              href: "#",
+            },
+          ])
+        );
+        localStorage.setItem("selectedKey", JSON.stringify(["Dashboards"]));
+        useBreadcrumb.setState(() => {
+          return {
+            breadcrumb: [
+              {
+                title: "Dashboard",
+                href: "#",
+              },
+            ],
+          };
+        });
+      },
     },
     {
-      key: "users",
+      key: "Users",
       icon: (
         <img
           className="w-[15px] h-[15px]"
@@ -34,7 +57,7 @@ const Nav: React.FC = () => {
       label: "Users",
       children: [
         {
-          key: "user",
+          key: "User",
           label: "User",
           icon: (
             <img
@@ -44,10 +67,40 @@ const Nav: React.FC = () => {
               alt="user--v1"
             />
           ),
-          onClick: () => navigate("/user"),
+          onClick: () => {
+            navigate("/user");
+            localStorage.setItem(
+              "breadcrumb",
+              JSON.stringify([
+                {
+                  title: "Users",
+                  href: "#",
+                },
+                {
+                  title: "User",
+                  href: "#",
+                },
+              ])
+            );
+            localStorage.setItem("selectedKey", JSON.stringify(["User"]));
+            useBreadcrumb.setState(() => {
+              return {
+                breadcrumb: [
+                  {
+                    title: "Users",
+                    href: "#",
+                  },
+                  {
+                    title: "User",
+                    href: "#",
+                  },
+                ],
+              };
+            });
+          },
         },
         {
-          key: "voucher",
+          key: "Voucher",
           label: "Voucher",
           icon: (
             <img
@@ -56,12 +109,42 @@ const Nav: React.FC = () => {
               alt="discount-ticket"
             />
           ),
-          onClick: () => navigate("/voucher"),
+          onClick: () => {
+            navigate("/user");
+            localStorage.setItem(
+              "breadcrumb",
+              JSON.stringify([
+                {
+                  title: "Users",
+                  href: "#",
+                },
+                {
+                  title: "Voucher",
+                  href: "#",
+                },
+              ])
+            );
+            localStorage.setItem("selectedKey", JSON.stringify(["Voucher"]));
+            useBreadcrumb.setState(() => {
+              return {
+                breadcrumb: [
+                  {
+                    title: "Users",
+                    href: "#",
+                  },
+                  {
+                    title: "Voucher",
+                    href: "#",
+                  },
+                ],
+              };
+            });
+          },
         },
       ],
     },
     {
-      key: "products",
+      key: "Products",
       icon: (
         <img
           className="w-[15px] h-[15px]"
@@ -72,7 +155,7 @@ const Nav: React.FC = () => {
       label: "Products",
       children: [
         {
-          key: "product",
+          key: "Product",
           label: "Product",
           icon: (
             <img
@@ -81,12 +164,42 @@ const Nav: React.FC = () => {
               alt="product--v1"
             />
           ),
-          onClick: () => navigate("/product"),
+          onClick: () => {
+            navigate("/product");
+            localStorage.setItem(
+              "breadcrumb",
+              JSON.stringify([
+                {
+                  title: "Products",
+                  href: "#",
+                },
+                {
+                  title: "Product",
+                  href: "#",
+                },
+              ])
+            );
+            localStorage.setItem("selectedKey", JSON.stringify(["Product"]));
+            useBreadcrumb.setState(() => {
+              return {
+                breadcrumb: [
+                  {
+                    title: "Products",
+                    href: "#",
+                  },
+                  {
+                    title: "Product",
+                    href: "#",
+                  },
+                ],
+              };
+            });
+          },
         },
       ],
     },
     {
-      key: "services",
+      key: "Services",
       label: "Services",
       icon: (
         <img
@@ -97,7 +210,7 @@ const Nav: React.FC = () => {
       ),
       children: [
         {
-          key: "service",
+          key: "Service",
           label: "Service",
           icon: (
             <img
@@ -106,7 +219,37 @@ const Nav: React.FC = () => {
               alt="service--v1"
             />
           ),
-          onClick: () => navigate("/service"),
+          onClick: () => {
+            navigate("/service");
+            localStorage.setItem(
+              "breadcrumb",
+              JSON.stringify([
+                {
+                  title: "Services",
+                  href: "#",
+                },
+                {
+                  title: "Service",
+                  href: "#",
+                },
+              ])
+            );
+            localStorage.setItem("selectedKey", JSON.stringify(["Service"]));
+            useBreadcrumb.setState(() => {
+              return {
+                breadcrumb: [
+                  {
+                    title: "Services",
+                    href: "#",
+                  },
+                  {
+                    title: "Service",
+                    href: "#",
+                  },
+                ],
+              };
+            });
+          },
         },
       ],
     },
@@ -115,6 +258,7 @@ const Nav: React.FC = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+  console.log(JSON.parse(localStorage.getItem("breadcrumb") || "[]"));
 
   return (
     <div className="w-full">
@@ -126,8 +270,10 @@ const Nav: React.FC = () => {
       </Button>
       {!collapsed && <img src="./large.png" alt="logo" />}
       <Menu
-        defaultSelectedKeys={["dashboards"]}
-        defaultOpenKeys={["users", "products", "services"]}
+        defaultSelectedKeys={JSON.parse(
+          localStorage.getItem("selectedKey") || "[]"
+        )}
+        defaultOpenKeys={["Users", "Products", "Services"]}
         mode="inline"
         theme="light"
         inlineCollapsed={collapsed}

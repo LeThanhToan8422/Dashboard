@@ -9,16 +9,24 @@ import { v4 as uuidv4 } from "uuid";
 const User = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm<FieldType>();
-  const addUser = useUserState((state) => state.addUser);
+  const { currentFeature, addUser, updateUser } = useUserState();
   const uuidRef = useRef("");
 
   const showModal = () => {
     uuidRef.current = uuidv4();
+    form.resetFields();
     setIsModalOpen(true);
+    useUserState.setState(() => ({
+      currentFeature: "create",
+    }));
   };
 
   const handleOk = () => {
-    addUser();
+    if (currentFeature === "create") {
+      addUser();
+    } else {
+      updateUser();
+    }
     setIsModalOpen(false);
   };
 
@@ -42,7 +50,7 @@ const User = () => {
             <UserForm form={form} uuidKey={uuidRef.current} />
           </Modal>
         </div>
-        <TableUser />
+        <TableUser setIsModalOpen={setIsModalOpen} />
       </div>
     </div>
   );

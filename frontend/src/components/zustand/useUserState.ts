@@ -15,6 +15,7 @@ interface UserState {
   setUser: (user: UserData) => void;
   addUser: () => void;
   updateUser: () => void;
+  deleteUser: () => void;
 }
 
 const store: StateCreator<UserState> = (set) => ({
@@ -86,6 +87,10 @@ const store: StateCreator<UserState> = (set) => ({
         ...state.users.filter((u) => u.key !== state.user.key),
         state.user,
       ],
+    })),
+  deleteUser: () =>
+    set((state) => ({
+      users: [...state.users.filter((u) => u.key !== state.user.key)],
     })),
 });
 

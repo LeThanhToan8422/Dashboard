@@ -34,6 +34,7 @@ interface TableUserProps {
 
 const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
   const data = useUserState((state) => state.users);
+  const deleteUser = useUserState((state) => state.deleteUser);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<InputRef>(null);
@@ -256,8 +257,10 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
                   label: <span style={{ color: "#ff4d4f" }}>Delete</span>,
                   onClick: () => {
                     useUserState.setState(() => ({
+                      user: record,
                       currentFeature: "delete",
                     }));
+                    deleteUser();
                   },
                 },
               ],

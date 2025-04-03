@@ -24,7 +24,7 @@ const User = () => {
   const handleOk = () => {
     if (currentFeature === "create") {
       addUser();
-    } else {
+    } else if (currentFeature === "update") {
       updateUser();
     }
     setIsModalOpen(false);

@@ -59,7 +59,10 @@ const UserForm: React.FC<UserModalProps> = ({ form, uuidKey }) => {
       onValuesChange={onValuesChange}
       autoComplete="off"
       layout="horizontal"
-      className="p-4">
+      className="p-4"
+      disabled={
+        useUserState.getState().currentFeature === "view" ? true : false
+      }>
       <Form.Item<FieldType>
         label="Name"
         name="name"

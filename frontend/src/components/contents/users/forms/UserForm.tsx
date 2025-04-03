@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import type { FormProps, FormInstance } from "antd";
 import { Form, Input, InputNumber } from "antd";
 import { useUserState } from "../../../zustand/useUserState";
@@ -14,6 +15,19 @@ interface UserModalProps {
 }
 
 const UserForm: React.FC<UserModalProps> = ({ form, uuidKey }) => {
+  const user = useUserState((state) => state.user);
+  const currentFeature = useUserState((state) => state.currentFeature);
+
+  useEffect(() => {
+    if (currentFeature !== "create") {
+      form.setFieldsValue({
+        name: user.name,
+        age: user.age,
+        address: user.address,
+      });
+    }
+  }, [form, user, currentFeature]);
+
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     console.log("Success:", values);
   };
@@ -29,7 +43,7 @@ const UserForm: React.FC<UserModalProps> = ({ form, uuidKey }) => {
       user: {
         ...state.user,
         ...changedValues,
-        key: uuidKey,
+        key: currentFeature === "create" ? uuidKey : state.user.key,
       },
     }));
   };
@@ -61,6 +75,7 @@ const UserForm: React.FC<UserModalProps> = ({ form, uuidKey }) => {
           className="w-full rounded-md"
           placeholder="Enter your age"
           min={1}
+          style={{ width: "100%" }}
         />
       </Form.Item>
 

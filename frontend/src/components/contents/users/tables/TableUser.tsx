@@ -28,7 +28,11 @@ type DataIndex = keyof DataType;
 type TableRowSelection<T extends object = object> =
   TableProps<T>["rowSelection"];
 
-const TableUser: React.FC = () => {
+interface TableUserProps {
+  setIsModalOpen: (value: boolean) => void;
+}
+
+const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
   const data = useUserState((state) => state.users);
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -217,46 +221,67 @@ const TableUser: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: () => (
-        <Dropdown
-          menu={{
-            items: [
-              {
-                key: "1",
-                icon: <EyeOutlined style={{ color: "#1890ff" }} />,
-                label: <span style={{ color: "#1890ff" }}>View Details</span>,
-              },
-              {
-                key: "2",
-                icon: <EditOutlined style={{ color: "#52c41a" }} />,
-                label: <span style={{ color: "#52c41a" }}>Edit</span>,
-              },
-              {
-                key: "3",
-                icon: <DeleteOutlined style={{ color: "#ff4d4f" }} />,
-                label: <span style={{ color: "#ff4d4f" }}>Delete</span>,
-              },
-            ],
-          }}
-          trigger={["hover"]}>
-          <Button
-            type="text"
-            icon={
-              <MoreOutlined style={{ fontSize: "20px", color: "#595959" }} />
-            }
-            style={{
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "all 0.3s",
+      render: (_, record) => {
+        return (
+          <Dropdown
+            menu={{
+              items: [
+                {
+                  key: "1",
+                  icon: <EyeOutlined style={{ color: "#1890ff" }} />,
+                  label: <span style={{ color: "#1890ff" }}>View Details</span>,
+                  onClick: () => {
+                    useUserState.setState(() => ({
+                      user: record,
+                      currentFeature: "view",
+                    }));
+                    setIsModalOpen(true);
+                  },
+                },
+                {
+                  key: "2",
+                  icon: <EditOutlined style={{ color: "#52c41a" }} />,
+                  label: <span style={{ color: "#52c41a" }}>Edit</span>,
+                  onClick: () => {
+                    useUserState.setState(() => ({
+                      user: record,
+                      currentFeature: "update",
+                    }));
+                    setIsModalOpen(true);
+                  },
+                },
+                {
+                  key: "3",
+                  icon: <DeleteOutlined style={{ color: "#ff4d4f" }} />,
+                  label: <span style={{ color: "#ff4d4f" }}>Delete</span>,
+                  onClick: () => {
+                    useUserState.setState(() => ({
+                      currentFeature: "delete",
+                    }));
+                  },
+                },
+              ],
             }}
-            className="hover:bg-[#f0f0f0]"
-          />
-        </Dropdown>
-      ),
+            trigger={["hover"]}>
+            <Button
+              type="text"
+              icon={
+                <MoreOutlined style={{ fontSize: "20px", color: "#595959" }} />
+              }
+              style={{
+                borderRadius: "50%",
+                width: "32px",
+                height: "32px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all 0.3s",
+              }}
+              className="hover:bg-[#f0f0f0]"
+            />
+          </Dropdown>
+        );
+      },
     },
   ];
 

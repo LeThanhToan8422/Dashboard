@@ -11,8 +11,10 @@ interface UserData {
 interface UserState {
   user: UserData;
   users: UserData[];
+  currentFeature: string;
   setUser: (user: UserData) => void;
   addUser: () => void;
+  updateUser: () => void;
 }
 
 const store: StateCreator<UserState> = (set) => ({
@@ -72,10 +74,18 @@ const store: StateCreator<UserState> = (set) => ({
       address: "London No. 2 Lake Park",
     },
   ],
+  currentFeature: "create",
   setUser: (user) => set(() => ({ user })),
   addUser: () =>
     set((state) => ({
       users: [...state.users, state.user],
+    })),
+  updateUser: () =>
+    set((state) => ({
+      users: [
+        ...state.users.filter((u) => u.key !== state.user.key),
+        state.user,
+      ],
     })),
 });
 

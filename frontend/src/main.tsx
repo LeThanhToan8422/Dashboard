@@ -10,6 +10,7 @@ import Dashboard from "./components/contents/dashboards/Dashboard.tsx";
 import Order from "./components/contents/users/Order.tsx";
 import Login from "./components/contents/auth/Login.tsx";
 import ProtectedRoute from "./components/contents/auth/ProtectedRoute.tsx";
+import { ToastContainer } from "react-toastify";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -31,5 +32,6 @@ createRoot(document.getElementById("root")!).render(
         </Route>
       </Routes>
     </BrowserRouter>
+    <ToastContainer />
   </StrictMode>
 );

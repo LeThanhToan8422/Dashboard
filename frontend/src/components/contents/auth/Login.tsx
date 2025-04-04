@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, Card, message } from "antd";
+import { Form, Input, Button, Card } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useAuthState } from "../../zustand/useAuthState";
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 
 interface LoginForm {
   username: string;
@@ -27,14 +28,44 @@ const Login: React.FC = () => {
     try {
       await login(values);
       if (useAuthState.getState().isAuthenticated) {
-        message.success("Login successful!");
+        toast.success("🦄 Login successful!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
         navigate("/");
       } else {
-        message.success("Login failed!");
+        toast.error("🦄 Username or password incorrect.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
       }
     } catch (err) {
       console.log(err);
-      message.error("Login failed. Please try again.");
+      toast.error("🦄 Login failed. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+      });
     }
   };
 

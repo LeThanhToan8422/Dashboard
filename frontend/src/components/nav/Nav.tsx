@@ -32,7 +32,7 @@ const Nav: React.FC = () => {
             },
           ])
         );
-        localStorage.setItem("selectedKey", JSON.stringify(["Dashboards"]));
+        localStorage.setItem("selectedKey", JSON.stringify(["Dashboard"]));
         useBreadcrumb.setState(() => {
           return {
             breadcrumb: [
@@ -124,7 +124,7 @@ const Nav: React.FC = () => {
                 },
               ])
             );
-            localStorage.setItem("selectedKey", JSON.stringify(["Voucher"]));
+            localStorage.setItem("selectedKey", JSON.stringify(["Order"]));
             useBreadcrumb.setState(() => {
               return {
                 breadcrumb: [

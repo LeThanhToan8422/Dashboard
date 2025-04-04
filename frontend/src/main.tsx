@@ -8,12 +8,21 @@ import Product from "./components/contents/products/Product.tsx";
 import Service from "./components/contents/services/Service.tsx";
 import Dashboard from "./components/contents/dashboards/Dashboard.tsx";
 import Order from "./components/contents/users/Order.tsx";
+import Login from "./components/contents/auth/Login.tsx";
+import ProtectedRoute from "./components/contents/auth/ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />}>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <App />
+            </ProtectedRoute>
+          }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user" element={<User />} />
           <Route path="/order" element={<Order />} />

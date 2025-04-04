@@ -5,11 +5,7 @@ import {
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  UserOutlined,
-  PhoneOutlined,
-  MailOutlined,
-  HomeOutlined,
-  BankOutlined,
+  DollarOutlined,
 } from "@ant-design/icons";
 import type { InputRef, TableColumnsType } from "antd";
 import {
@@ -19,23 +15,41 @@ import {
   Table,
   Dropdown,
   Tag,
-  Avatar,
+  Image,
   Tooltip,
 } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import type { Key } from "rc-table/lib/interface";
+import type { UploadFile } from "antd/es/upload/interface";
 import Highlighter from "react-highlight-words";
-import { useUserState, UserData } from "../../../zustand/useUserState";
+import {
+  ProductState,
+  useProductState,
+} from "../../../zustand/useProductState";
 
-type DataIndex = keyof UserData;
+interface DataType {
+  key: string;
+  name: string;
+  status: "active" | "inactive";
+  image: string | UploadFile[];
+  description?: string;
+  category?: string;
+  price?: number;
+  discountPercentage?: number;
+  rating?: number;
+  stock?: number;
+  brand?: string;
+}
 
-interface TableUserProps {
+interface TableProductProps {
   setIsModalOpen: (value: boolean) => void;
 }
 
-const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
-  const data = useUserState((state) => state.users);
-  const deleteUser = useUserState((state) => state.deleteUser);
+const TableProduct: React.FC<TableProductProps> = ({ setIsModalOpen }) => {
+  const data = useProductState((state: ProductState) => state.products);
+  const deleteProduct = useProductState(
+    (state: ProductState) => state.deleteProduct
+  );
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef<InputRef>(null);
@@ -43,7 +57,7 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
   const handleSearch = (
     selectedKeys: string[],
     confirm: FilterDropdownProps["confirm"],
-    dataIndex: DataIndex
+    dataIndex: keyof DataType
   ) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -55,9 +69,7 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
     setSearchText("");
   };
 
-  const getColumnSearchProps = (
-    dataIndex: keyof UserData
-  ): TableColumnsType<UserData>[number] => ({
+  const getColumnSearchProps = (dataIndex: keyof DataType) => ({
     filterDropdown: ({
       setSelectedKeys,
       selectedKeys,
@@ -99,6 +111,16 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
             type="link"
             size="small"
             onClick={() => {
+              confirm({ closeDropdown: false });
+              setSearchText((selectedKeys as string[])[0]);
+              setSearchedColumn(dataIndex);
+            }}>
+            Filter
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
               close();
             }}>
             close
@@ -109,28 +131,11 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
     filterIcon: (filtered: boolean) => (
       <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
     ),
-    onFilter: (value: boolean | Key, record: UserData) => {
-      const key = dataIndex as keyof UserData;
-      const fieldValue = record[key];
-
-      if (!fieldValue) return false;
-
-      if (typeof fieldValue === "object") {
-        return JSON.stringify(fieldValue)
-          .toLowerCase()
-          .includes(value.toString().toLowerCase());
-      }
-
-      return fieldValue
-        .toString()
+    onFilter: (value: boolean | Key, record: DataType) =>
+      record[dataIndex]
+        ?.toString()
         .toLowerCase()
-        .includes(value.toString().toLowerCase());
-    },
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
-        setTimeout(() => searchInput.current?.select(), 100);
-      }
-    },
+        .includes(value.toString().toLowerCase()) ?? false,
     render: (text: string) =>
       searchedColumn === dataIndex ? (
         <Highlighter
@@ -144,100 +149,113 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
       ),
   });
 
-  const columns: TableColumnsType<UserData> = [
+  const columns: TableColumnsType<DataType> = [
     {
       title: "ID",
       dataIndex: "key",
-      width: "5%",
-      render: (key: string) => key,
+      render: (key: string) => key.split("-")[0],
     },
     {
-      title: "User Info",
-      dataIndex: "firstName",
-      width: "25%",
-      ...getColumnSearchProps("firstName"),
-      render: (_, record) => (
-        <Space>
-          <Avatar
-            src={
-              typeof record.image === "string"
-                ? record.image
-                : record.image[0]?.url
-            }
-            icon={<UserOutlined />}
-          />
-          <Space direction="vertical" size={0}>
-            <Space>
-              <span className="font-medium">
-                {record.firstName} {record.lastName}
-              </span>
-              <Tag
-                color={
-                  record.role === "admin"
-                    ? "red"
-                    : record.role === "moderator"
-                    ? "blue"
-                    : "default"
-                }>
-                {record.role.toUpperCase()}
-              </Tag>
-            </Space>
-            <span className="text-gray-500">@{record.username}</span>
-          </Space>
-        </Space>
-      ),
-      sorter: (a, b) =>
-        `${a.firstName} ${a.lastName}`.localeCompare(
-          `${b.firstName} ${b.lastName}`
-        ),
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      width: "20%",
+      ...getColumnSearchProps("name"),
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      sortDirections: ["descend", "ascend"],
     },
     {
-      title: "Contact",
-      dataIndex: "email",
-      width: "25%",
-      ...getColumnSearchProps("email"),
-      render: (_, record) => (
-        <Space direction="vertical" size={1}>
-          <Space>
-            <MailOutlined /> {record.email}
-          </Space>
-          <Space>
-            <PhoneOutlined /> {record.phone}
-          </Space>
-        </Space>
-      ),
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      width: "10%",
+      ...getColumnSearchProps("category"),
+      sorter: (a, b) => (a.category ?? "").localeCompare(b.category ?? ""),
+      sortDirections: ["descend", "ascend"],
     },
     {
-      title: "Location",
-      dataIndex: "address",
-      width: "25%",
-      render: (address) => (
+      title: "Brand",
+      dataIndex: "brand",
+      key: "brand",
+      width: "10%",
+      ...getColumnSearchProps("brand"),
+      sorter: (a, b) => (a.brand ?? "").localeCompare(b.brand ?? ""),
+      sortDirections: ["descend", "ascend"],
+    },
+    {
+      title: "Price",
+      dataIndex: "price",
+      key: "price",
+      width: "10%",
+      render: (price?: number, record?: DataType) => (
         <Tooltip
-          title={`${address.city}, ${address.state}, ${address.country}`}>
+          title={
+            record?.discountPercentage
+              ? `${record.discountPercentage}% off`
+              : ""
+          }>
           <Space>
-            <HomeOutlined />
-            <span>{address.address}</span>
+            <DollarOutlined />
+            <span>{price?.toFixed(2)}</span>
+            {record?.discountPercentage && (
+              <Tag color="red">{record.discountPercentage}% OFF</Tag>
+            )}
           </Space>
         </Tooltip>
       ),
+      sorter: (a, b) => (a.price ?? 0) - (b.price ?? 0),
+      sortDirections: ["descend", "ascend"],
     },
     {
-      title: "Company",
-      dataIndex: "company",
-      width: "15%",
-      render: (company) => (
-        <Tooltip title={`${company.department} - ${company.title}`}>
-          <Space>
-            <BankOutlined />
-            <span>{company.name}</span>
-          </Space>
-        </Tooltip>
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      width: "10%",
+      render: (status: "active" | "inactive", record?: DataType) => (
+        <Space direction="vertical" size="small">
+          <Tag color={status === "active" ? "success" : "error"}>
+            {status.toUpperCase()}
+          </Tag>
+          {record?.stock !== undefined && (
+            <Tag color={record.stock > 10 ? "blue" : "orange"}>
+              Stock: {record.stock}
+            </Tag>
+          )}
+        </Space>
+      ),
+      sorter: (a, b) => a.status.localeCompare(b.status),
+      sortDirections: ["descend", "ascend"],
+    },
+    {
+      title: "Rating",
+      dataIndex: "rating",
+      key: "rating",
+      width: "10%",
+      render: (rating?: number) => (
+        <Tag color={rating && rating > 4.5 ? "gold" : "blue"}>
+          ⭐ {rating?.toFixed(1)}
+        </Tag>
+      ),
+      sorter: (a, b) => (a.rating ?? 0) - (b.rating ?? 0),
+      sortDirections: ["descend", "ascend"],
+    },
+    {
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      width: "10%",
+      render: (image: string | UploadFile[]) => (
+        <Image
+          src={typeof image === "string" ? image : image[0].url}
+          alt="product"
+          width={50}
+          height={50}
+        />
       ),
     },
     {
       title: "Actions",
       key: "actions",
-      width: "5%",
       render: (_, record) => (
         <Dropdown
           menu={{
@@ -247,8 +265,8 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
                 icon: <EyeOutlined style={{ color: "#1890ff" }} />,
                 label: <span style={{ color: "#1890ff" }}>View Details</span>,
                 onClick: () => {
-                  useUserState.setState(() => ({
-                    user: record,
+                  useProductState.setState(() => ({
+                    product: record,
                     currentFeature: "view",
                   }));
                   setIsModalOpen(true);
@@ -259,8 +277,8 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
                 icon: <EditOutlined style={{ color: "#52c41a" }} />,
                 label: <span style={{ color: "#52c41a" }}>Edit</span>,
                 onClick: () => {
-                  useUserState.setState(() => ({
-                    user: record,
+                  useProductState.setState(() => ({
+                    product: record,
                     currentFeature: "update",
                   }));
                   setIsModalOpen(true);
@@ -271,11 +289,11 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
                 icon: <DeleteOutlined style={{ color: "#ff4d4f" }} />,
                 label: <span style={{ color: "#ff4d4f" }}>Delete</span>,
                 onClick: () => {
-                  useUserState.setState(() => ({
-                    user: record,
+                  useProductState.setState(() => ({
+                    product: record,
                     currentFeature: "delete",
                   }));
-                  deleteUser();
+                  deleteProduct();
                 },
               },
             ],
@@ -303,7 +321,7 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
   ];
 
   return (
-    <Table<UserData>
+    <Table<DataType>
       columns={columns}
       dataSource={data}
       pagination={{
@@ -313,4 +331,4 @@ const TableUser: React.FC<TableUserProps> = ({ setIsModalOpen }) => {
   );
 };
 
-export default TableUser;
+export default TableProduct;

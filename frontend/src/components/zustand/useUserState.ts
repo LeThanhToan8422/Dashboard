@@ -1,96 +1,180 @@
 import { create } from "zustand";
 import { StateCreator } from "zustand";
+import axios from "axios";
+import { Dayjs } from "dayjs";
+import { UploadFile } from "antd/es/upload/interface";
 
-interface UserData {
-  key: string;
-  name: string;
-  age: number;
+interface Address {
   address: string;
+  city: string;
+  state: string;
+  stateCode: string;
+  postalCode: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+  country: string;
+}
+
+interface Company {
+  department: string;
+  name: string;
+  title: string;
+  address: Address;
+}
+
+interface Hair {
+  color: string;
+  type: string;
+}
+
+export interface UserData {
+  key: string;
+  firstName: string;
+  lastName: string;
+  maidenName?: string;
+  age: number;
+  gender: string;
+  email: string;
+  phone: string;
+  username: string;
+  birthDate: string | Dayjs;
+  image: string | UploadFile[];
+  bloodGroup: string;
+  height: number;
+  weight: number;
+  eyeColor: string;
+  hair: Hair;
+  address: Address;
+  university?: string;
+  company: Company;
+  role: "admin" | "moderator" | "user";
 }
 
 interface UserState {
   user: UserData;
   users: UserData[];
-  currentFeature: string;
+  currentFeature: "create" | "update" | "view" | "delete" | null;
+  isLoading: boolean;
+  error: string | null;
   setUser: (user: UserData) => void;
+  resetUser: () => void;
+  fetchUsers: () => Promise<void>;
   addUser: () => void;
   updateUser: () => void;
   deleteUser: () => void;
 }
 
-const store: StateCreator<UserState> = (set) => ({
-  user: {
-    key: "",
-    name: "",
-    age: 0,
-    address: "",
+interface ApiResponse {
+  users: Array<UserData & { id: number }>;
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+const initUserValues: UserData = {
+  key: "",
+  firstName: "",
+  lastName: "",
+  age: 0,
+  gender: "",
+  email: "",
+  phone: "",
+  username: "",
+  birthDate: "",
+  image: "",
+  bloodGroup: "",
+  height: 0,
+  weight: 0,
+  eyeColor: "",
+  hair: {
+    color: "",
+    type: "",
   },
-  users: [
-    {
-      key: "1",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
+  address: {
+    address: "",
+    city: "",
+    state: "",
+    stateCode: "",
+    postalCode: "",
+    coordinates: {
+      lat: 0,
+      lng: 0,
     },
-    {
-      key: "2",
-      name: "Joe Black",
-      age: 42,
-      address: "London No. 1 Lake Park",
+    country: "",
+  },
+  company: {
+    department: "",
+    name: "",
+    title: "",
+    address: {
+      address: "",
+      city: "",
+      state: "",
+      stateCode: "",
+      postalCode: "",
+      coordinates: {
+        lat: 0,
+        lng: 0,
+      },
+      country: "",
     },
-    {
-      key: "3",
-      name: "Jim Green",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-    },
-    {
-      key: "4",
-      name: "Jim Red",
-      age: 32,
-      address: "London No. 2 Lake Park",
-    },
-    {
-      key: "5",
-      name: "John Brown",
-      age: 32,
-      address: "New York No. 1 Lake Park",
-    },
-    {
-      key: "6",
-      name: "Joe Black",
-      age: 42,
-      address: "London No. 1 Lake Park",
-    },
-    {
-      key: "7",
-      name: "Jim Green",
-      age: 32,
-      address: "Sydney No. 1 Lake Park",
-    },
-    {
-      key: "8",
-      name: "Jim Red",
-      age: 32,
-      address: "London No. 2 Lake Park",
-    },
-  ],
-  currentFeature: "create",
+  },
+  role: "user" as const,
+};
+
+const store: StateCreator<UserState> = (set) => ({
+  user: initUserValues,
+  users: [],
+  currentFeature: null,
+  isLoading: false,
+  error: null,
   setUser: (user) => set(() => ({ user })),
-  addUser: () =>
-    set((state) => ({
-      users: [...state.users, state.user],
+  resetUser: () =>
+    set(() => ({
+      user: initUserValues,
     })),
+  fetchUsers: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get<ApiResponse>(
+        "https://dummyjson.com/users"
+      );
+      const formattedUsers = response.data.users.map((user) => ({
+        ...user,
+        key: user.id.toString(),
+      }));
+      set({ users: formattedUsers, isLoading: false });
+    } catch (err) {
+      console.log(err);
+      set({ error: "Failed to fetch users", isLoading: false });
+    }
+  },
+  addUser: () =>
+    set((state) => {
+      console.log(state.user);
+      return {
+        users: [
+          ...state.users,
+          {
+            ...state.user,
+            image: `https://picsum.photos/${Math.floor(Math.random() * 1000)}`,
+          },
+        ],
+      };
+    }),
   updateUser: () =>
     set((state) => ({
-      users: [
-        ...state.users.filter((u) => u.key !== state.user.key),
-        state.user,
-      ],
+      users: state.users.map((u) =>
+        u.key === state.user.key ? state.user : u
+      ),
     })),
   deleteUser: () =>
     set((state) => ({
-      users: [...state.users.filter((u) => u.key !== state.user.key)],
+      users: state.users.filter((u) => u.key !== state.user.key),
+      user: state.user,
+      currentFeature: null,
     })),
 });
 

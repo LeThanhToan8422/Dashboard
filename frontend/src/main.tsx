@@ -7,7 +7,7 @@ import User from "./components/contents/users/User.tsx";
 import Product from "./components/contents/products/Product.tsx";
 import Service from "./components/contents/services/Service.tsx";
 import Dashboard from "./components/contents/dashboards/Dashboard.tsx";
-import Voucher from "./components/contents/users/Voucher.tsx";
+import Order from "./components/contents/users/Order.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<App />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user" element={<User />} />
-          <Route path="/voucher" element={<Voucher />} />
+          <Route path="/order" element={<Order />} />
           <Route path="/product" element={<Product />} />
           <Route path="/service" element={<Service />} />
         </Route>

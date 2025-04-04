@@ -100,17 +100,17 @@ const Nav: React.FC = () => {
           },
         },
         {
-          key: "Voucher",
-          label: "Voucher",
+          key: "Order",
+          label: "Order",
           icon: (
             <img
               className="w-[15px] h-[15px]"
-              src="https://img.icons8.com/windows/32/discount-ticket.png"
-              alt="discount-ticket"
+              src="https://img.icons8.com/material-outlined/24/purchase-order.png"
+              alt="purchase-order"
             />
           ),
           onClick: () => {
-            navigate("/user");
+            navigate("/order");
             localStorage.setItem(
               "breadcrumb",
               JSON.stringify([
@@ -119,7 +119,7 @@ const Nav: React.FC = () => {
                   href: "#",
                 },
                 {
-                  title: "Voucher",
+                  title: "Order",
                   href: "#",
                 },
               ])
@@ -258,8 +258,6 @@ const Nav: React.FC = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
-  console.log(JSON.parse(localStorage.getItem("breadcrumb") || "[]"));
-
   return (
     <div className="w-full">
       <Button

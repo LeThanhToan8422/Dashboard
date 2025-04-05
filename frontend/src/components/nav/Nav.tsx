@@ -258,6 +258,7 @@ const Nav: React.FC = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+
   return (
     <div className="w-full">
       <Button

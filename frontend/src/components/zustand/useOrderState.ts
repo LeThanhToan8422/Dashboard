@@ -19,6 +19,7 @@ const store: StateCreator<OrderState> = (set) => ({
       const response = await orderService.getOrders();
       set({ orders: response.carts, isLoading: false });
     } catch (error) {
+      console.log(error);
       set({ error: "Failed to fetch orders", isLoading: false });
     }
   },

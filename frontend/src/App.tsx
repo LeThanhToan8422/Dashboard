@@ -25,11 +25,21 @@ function App() {
   ];
 
   useEffect(() => {
-    navigate(
-      localStorage.getItem("selectedKey")
-        ? `/${JSON.parse(localStorage.getItem("selectedKey") || "[]")[0]}`
-        : "/Dashboard"
-    );
+    if (localStorage.getItem("selectedKey")) {
+      navigate(
+        `/${JSON.parse(localStorage.getItem("selectedKey") || "[]")[0]}`
+      );
+    } else {
+      localStorage.setItem("selectedKey", JSON.stringify(["Dashboard"]));
+      navigate("/Dashboard");
+    }
+
+    if (!localStorage.getItem("breadcrumb")) {
+      localStorage.setItem(
+        "breadcrumb",
+        JSON.stringify([{ title: "Dashboard", href: "#" }])
+      );
+    }
   }, [navigate]);
 
   useEffect(() => {
